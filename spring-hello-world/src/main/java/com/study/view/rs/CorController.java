@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/cores")
@@ -14,7 +15,7 @@ public class CorController {
 
     private final Map<Integer, CorDto> cores = new HashMap<>();
 
-    @GetMapping
+    //@GetMapping
     public ResponseEntity<List<CorDto>> listCores() {
         log.info("Listing cores");
         if (cores.isEmpty()) {
@@ -39,6 +40,18 @@ public class CorController {
             return ResponseEntity
                     .ok(cor);
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CorDto>> getCor(@RequestParam(value = "prefixo", required = false) String prefixo) {
+        log.info("Getting cor with prefix {}", prefixo);
+        if(Objects.isNull(prefixo)) return listCores();
+        var selectedCores = cores.values().stream()
+                .filter(cor -> cor.getDescricao()
+                        .startsWith(prefixo))
+                .collect(Collectors.toList());
+        return ResponseEntity
+                .ok(selectedCores);
     }
 
     @PostMapping
